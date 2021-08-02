@@ -1,0 +1,90 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependências.
+ */
+
+const app = require('../app');
+const debug = require('debug')('sar-anime-mania:server');
+const http = require('http');
+
+/**
+ * Obtenha a porta do ambiente e armazene no Express.
+ */
+
+let port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
+
+/**
+ * Crie um servidor HTTP.
+ */
+
+let server = http.createServer(app);
+
+/**
+ * Ouvindo na porta fornecida, em todas as interfaces de rede.
+ */
+
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+/**
+ * Normalize uma porta em um número, string ou falso.
+ */
+
+function normalizePort(val) {
+  let port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+/**
+ * Ouvindo o evento de "erro" do servidor HTTP.
+ */
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  let bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port;
+
+  // lidar com erros de escuta específicos com mensagens amigáveis
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requer privilégios elevados');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' já está em uso');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Ouvindo eventos de "escuta" do servidor HTTP.
+ */
+
+function onListening() {
+  let addr = server.address();
+  let bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  debug('Listening on ' + bind);
+}
